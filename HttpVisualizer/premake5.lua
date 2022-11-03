@@ -9,7 +9,7 @@ project "HttpVisualizer"
     }
 
     CurlDir = cwd .. "/Dependencies/curl-7.86.0"
-    CurlBinDir = CurlDir .. "/BIN"
+    CurlBinDir = CurlDir .. "/Binaries"
     filter { "system:windows", "platforms:x64" }
         libdirs { CurlBinDir .. "/windows/x64" }
 --
@@ -97,7 +97,7 @@ project "HttpVisualizer"
         RaylibDir .. "/include",
         CurlDir .. "/include"
     }
-    
+
     links "raylib"
 
     filter "system:windows"
