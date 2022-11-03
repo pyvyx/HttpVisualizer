@@ -1,12 +1,20 @@
 project "HttpVisualizer"
     language "C++"
     cppdialect "C++17"
-    flags "FatalWarnings"
+    --flags "FatalWarnings"
 
     defines { 
         "_CRT_SECURE_NO_WARNINGS",
         "CURL_STATICLIB" 
     }
+
+    CurlDir = cwd .. "/Dependencies/curl-7.86.0"
+    CurlBinDir = CurlDir .. "/BIN"
+    filter { "system:windows", "platforms:x64" }
+        libdirs { CurlBinDir .. "/windows/x64" }
+--
+    filter { "system:windows", "platforms:x86" }
+        libdirs { CurlBinDir .. "/windows/x86" }
 
     -- gcc* clang* msc*
     filter "toolset:msc*"
@@ -81,36 +89,37 @@ project "HttpVisualizer"
     includedirs {
         RaylibDir .. "/src",
         RaylibDir .. "/include",
-        DepDir,
-        "D:/Dev/HttpVisualizer/Dependencies/curl-7.86.0/builds/libcurl-vc22-x64-debug-static-ipv6-sspi-schannel/include"
+        CurlDir .. "/include"
     }
 
     externalincludedirs {
         RaylibDir .. "/src",
         RaylibDir .. "/include",
-        DepDir
+        CurlDir .. "/include"
     }
-
-    links {
-        "raylib",
-        "Winmm",
-        "ws2_32",
-        "crypt32",
-        "Wldap32",
-        "Normaliz"
-    }
-
     
+    links "raylib"
+
+    filter "system:windows"
+        links {
+            "Winmm",
+            "ws2_32",
+            "crypt32",
+            "Wldap32",
+            "Normaliz",
+            "Advapi32",
+            "user32",
+            "gdi32",
+            "shell32"
+        }
+
     filter { "configurations:Debug" }
         kind "ConsoleApp"
         floatingpoint "default"
-        libdirs "D:/Dev/HttpVisualizer/Dependencies/curl-7.86.0/builds/libcurl-vc22-x64-debug-static-ipv6-sspi-schannel/lib"
         links "libcurl_a_debug"
 
     filter { "configurations:Release" }
-        --kind "WindowedApp"
-        kind "ConsoleApp"
+        kind "WindowedApp"
         entrypoint "mainCRTStartup"
         floatingpoint "fast"
-        libdirs "D:/Dev/HttpVisualizer/Dependencies/curl-7.86.0/builds/libcurl-vc22-x64-release-static-ipv6-sspi-schannel/lib"
         links "libcurl_a"

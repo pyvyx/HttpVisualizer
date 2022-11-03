@@ -10,7 +10,6 @@ outputdir = "/BIN/%{cfg.buildcfg}/%{cfg.architecture}/"
 -- get current working directory
 cwd = os.getcwd()
 RaylibDir = cwd .. "/Dependencies/raylib"
-DepDir = cwd .. "/Dependencies"
 
 targetdir(cwd .. outputdir .. "%{prj.name}/bin")
 objdir(cwd .. outputdir .. "%{prj.name}/bin-int")

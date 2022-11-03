@@ -55,8 +55,8 @@ extern "C" {            // Prevents name mangling of functions
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
 //----------------------------------------------------------------------------------
-RAYGUIAPI void GuiTextBoxSetActive(Rectangle bounds);                   // Sets the active textbox
-RAYGUIAPI Rectangle GuiTextBoxGetActive(void);                          // Get bounds of active textbox
+RAYGUIAPI void GuiTextBoxSetActive(Rect bounds);                   // Sets the active textbox
+RAYGUIAPI Rect GuiTextBoxGetActive(void);                          // Get bounds of active textbox
 
 RAYGUIAPI void GuiTextBoxSetCursor(int cursor);                         // Set cursor position of active textbox
 RAYGUIAPI int GuiTextBoxGetCursor(void);                                // Get cursor position of active textbox
@@ -64,7 +64,7 @@ RAYGUIAPI int GuiTextBoxGetCursor(void);                                // Get c
 RAYGUIAPI void GuiTextBoxSetSelection(int start, int length);           // Set selection of active textbox
 RAYGUIAPI Vector2 GuiTextBoxGetSelection(void);                         // Get selection of active textbox (x - selection start  y - selection length)
 
-RAYGUIAPI bool GuiTextBoxIsActive(Rectangle bounds);                    // Returns true if a textbox control with specified `bounds` is the active textbox
+RAYGUIAPI bool GuiTextBoxIsActive(Rect bounds);                    // Returns true if a textbox control with specified `bounds` is the active textbox
 RAYGUIAPI GuiTextBoxState GuiTextBoxGetState(void);                     // Get state for the active textbox
 RAYGUIAPI void GuiTextBoxSetState(GuiTextBoxState state);               // Set state for the active textbox (state must be valid else things will break)
 
@@ -75,11 +75,11 @@ RAYGUIAPI void GuiTextBoxCut(char *text);                               // Cut s
 RAYGUIAPI int GuiTextBoxDelete(char *text, int length, bool before);    // Deletes a character or selection before from the active textbox (depending on `before`). Returns bytes deleted.
 RAYGUIAPI int GuiTextBoxGetByteIndex(const char *text, int start, int from, int to); // Get the byte index for a character starting at position `from` with index `start` until position `to`.
 
-RAYGUIAPI bool GuiTextBoxEx(Rectangle bounds, char *text, int textSize, bool editMode);
+RAYGUIAPI bool GuiTextBoxEx(Rect bounds, char *text, int textSize, bool editMode);
 
-RAYGUIAPI static void DrawTextRec(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint);    // Draw text using font inside rectangle limits
-RAYGUIAPI static void DrawTextRecEx(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);    // Draw text using font inside rectangle limits with support for text selection
-RAYGUIAPI static void DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);    // Alias for above
+RAYGUIAPI static void DrawTextRec(Font font, const char *text, Rect rec, float fontSize, float spacing, bool wordWrap, Color tint);    // Draw text using font inside rectangle limits
+RAYGUIAPI static void DrawTextRecEx(Font font, const char *text, Rect rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);    // Draw text using font inside rectangle limits with support for text selection
+RAYGUIAPI static void DrawTextBoxedSelectable(Font font, const char *text, Rect rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint);    // Alias for above
 
 #ifdef __cplusplus
 }
@@ -100,13 +100,13 @@ RAYGUIAPI static void DrawTextBoxedSelectable(Font font, const char *text, Recta
 #endif
 
 // Draw text using font inside rectangle limits
-static void DrawTextRec(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint)
+static void DrawTextRec(Font font, const char *text, Rect rec, float fontSize, float spacing, bool wordWrap, Color tint)
 {
     DrawTextRecEx(font, text, rec, fontSize, spacing, wordWrap, tint, 0, 0, WHITE, WHITE);
 }
 
 // Draw text using font inside rectangle limits with support for text selection
-static void DrawTextRecEx(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint)
+static void DrawTextRecEx(Font font, const char *text, Rect rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint)
 {
     int length = TextLength(text);  // Total length in bytes of the text, scanned by codepoints in loop
 
@@ -206,7 +206,7 @@ static void DrawTextRecEx(Font font, const char *text, Rectangle rec, float font
                 bool isGlyphSelected = false;
                 if ((selectStart >= 0) && (k >= selectStart) && (k < (selectStart + selectLength)))
                 {
-                    DrawRectangleRec((Rectangle){ rec.x + textOffsetX - 1, rec.y + textOffsetY, glyphWidth, (float)font.baseSize*scaleFactor }, selectBackTint);
+                    DrawRectangleRec((Rect){ rec.x + textOffsetX - 1, rec.y + textOffsetY, glyphWidth, (float)font.baseSize*scaleFactor }, selectBackTint);
                     isGlyphSelected = true;
                 }
 
@@ -235,7 +235,7 @@ static void DrawTextRecEx(Font font, const char *text, Rectangle rec, float font
     }
 } 
 
-static void DrawTextBoxedSelectable(Font font, const char *text, Rectangle rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint) {
+static void DrawTextBoxedSelectable(Font font, const char *text, Rect rec, float fontSize, float spacing, bool wordWrap, Color tint, int selectStart, int selectLength, Color selectTint, Color selectBackTint) {
     DrawTextRecEx(font, text, rec, fontSize, spacing, wordWrap, tint, selectStart, selectLength, selectTint, selectBackTint);
 }
 
@@ -257,7 +257,7 @@ typedef enum {
 //----------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------
-static Rectangle guiTextBoxActive = { 0 };      // Area of the currently active textbox
+static Rect guiTextBoxActive = { 0 };      // Area of the currently active textbox
 
 static GuiTextBoxState guiTextBoxState = {      // Keeps state of the active textbox
     .cursor = -1,
@@ -270,15 +270,15 @@ static GuiTextBoxState guiTextBoxState = {      // Keeps state of the active tex
 // Module Internal Functions Declaration
 //----------------------------------------------------------------------------------
 static int GetPrevCodepoint(const char *text, const char *start, int *prev);
-static int GuiMeasureTextBox(const char *text, int length, Rectangle rec, int *pos, int mode);
-static int GuiMeasureTextBoxRev(const char *text, int length, Rectangle rec, int *pos);                 // Highly synchronized with calculations in DrawTextBoxedSelectable()
+static int GuiMeasureTextBox(const char *text, int length, Rect rec, int *pos, int mode);
+static int GuiMeasureTextBoxRev(const char *text, int length, Rect rec, int *pos);                 // Highly synchronized with calculations in DrawTextBoxedSelectable()
 
-static inline int GuiTextBoxGetCursorCoordinates(const char *text, int length, Rectangle rec, int pos); // Calculate cursor coordinates based on the cursor position `pos` inside the `text`.
-static inline int GuiTextBoxGetCursorFromMouse(const char *text, int length, Rectangle rec, int *pos);  // Calculate cursor position in textbox based on mouse coordinates.
-static inline int GuiTextBoxMaxCharacters(const char *text, int length, Rectangle rec);                 // Calculates how many characters is the textbox able to draw inside rec
+static inline int GuiTextBoxGetCursorCoordinates(const char *text, int length, Rect rec, int pos); // Calculate cursor coordinates based on the cursor position `pos` inside the `text`.
+static inline int GuiTextBoxGetCursorFromMouse(const char *text, int length, Rect rec, int *pos);  // Calculate cursor position in textbox based on mouse coordinates.
+static inline int GuiTextBoxMaxCharacters(const char *text, int length, Rect rec);                 // Calculates how many characters is the textbox able to draw inside rec
 static inline unsigned int GuiCountCodepointsUntilNewline(const char *text);    // Returns total number of characters(codepoints) in a UTF8 encoded `text` until `\0` or a `\n` is found.
 
-static inline void MoveTextBoxCursorRight(const char *text, int length, Rectangle textRec);
+static inline void MoveTextBoxCursorRight(const char *text, int length, Rect textRec);
 static inline void MoveTextBoxCursorLeft(const char *text);
 
 static int EncodeCodepoint(unsigned int c, char out[5]);
@@ -288,14 +288,14 @@ static int EncodeCodepoint(unsigned int c, char out[5]);
 //----------------------------------------------------------------------------------
 
 // Sets the active textbox (reseting state of the previous active textbox)
-RAYGUIAPI void GuiTextBoxSetActive(Rectangle bounds)
+RAYGUIAPI void GuiTextBoxSetActive(Rect bounds)
 {
     guiTextBoxActive = bounds;
     guiTextBoxState = (GuiTextBoxState){ .cursor = -1, .start = 0, .index = 0, .select = -1 };
 }
 
 // Gets bounds of active textbox
-RAYGUIAPI Rectangle GuiTextBoxGetActive(void) { return guiTextBoxActive; }
+RAYGUIAPI Rect GuiTextBoxGetActive(void) { return guiTextBoxActive; }
 
 // Set cursor position of active textbox
 RAYGUIAPI void GuiTextBoxSetCursor(int cursor)
@@ -327,7 +327,7 @@ RAYGUIAPI Vector2 GuiTextBoxGetSelection(void)
 }
 
 // Returns true if a textbox control with specified `bounds` is the active textbox
-RAYGUIAPI bool GuiTextBoxIsActive(Rectangle bounds)
+RAYGUIAPI bool GuiTextBoxIsActive(Rect bounds)
 {
     return (bounds.x == guiTextBoxActive.x && bounds.y == guiTextBoxActive.y &&
             bounds.width == guiTextBoxActive.width && bounds.height == guiTextBoxActive.height);
@@ -541,7 +541,7 @@ RAYGUIAPI void GuiTextBoxCut(char* text)
 // A text box control supporting text selection, cursor positioning and commonly used keyboard shortcuts.
 // NOTE 1: Requires static variables: framesCounter
 // NOTE 2: Returns if KEY_ENTER pressed (useful for data validation)
-RAYGUIAPI bool GuiTextBoxEx(Rectangle bounds, char *text, int textSize, bool editMode)
+RAYGUIAPI bool GuiTextBoxEx(Rect bounds, char *text, int textSize, bool editMode)
 {
     // Define the cursor movement/selection speed when movement keys are held/pressed
     #define TEXTBOX_CURSOR_COOLDOWN   5
@@ -576,7 +576,7 @@ RAYGUIAPI bool GuiTextBoxEx(Rectangle bounds, char *text, int textSize, bool edi
     }
 
     // Calculate the drawing area for the text inside the control `bounds`
-    Rectangle textRec = { bounds.x + GuiGetStyle(TEXTBOX, BORDER_WIDTH) + GuiGetStyle(TEXTBOX, TEXT_INNER_PADDING),
+    Rect textRec = { bounds.x + GuiGetStyle(TEXTBOX, BORDER_WIDTH) + GuiGetStyle(TEXTBOX, TEXT_INNER_PADDING),
                           bounds.y + verticalPadding + GuiGetStyle(TEXTBOX, BORDER_WIDTH),
                           bounds.width - 2*(GuiGetStyle(TEXTBOX, TEXT_INNER_PADDING) + GuiGetStyle(TEXTBOX, BORDER_WIDTH)),
                           (float)GuiGetStyle(DEFAULT, TEXT_SIZE) };
@@ -609,7 +609,7 @@ RAYGUIAPI bool GuiTextBoxEx(Rectangle bounds, char *text, int textSize, bool edi
             {
                 // When active and the right mouse is clicked outside the textbox we should deactivate it
                 // NOTE: We set a dummy rect as the active textbox bounds
-                GuiTextBoxSetActive(RAYGUI_CLITERAL(Rectangle){ 0, 0, -1, -1 });
+                GuiTextBoxSetActive(RAYGUI_CLITERAL(Rect){ 0, 0, -1, -1 });
                 active = false;
             }
 
@@ -1018,7 +1018,7 @@ static inline unsigned int GuiCountCodepointsUntilNewline(const char *text)
 }
 
 // Highly synchronized with calculations in DrawTextBoxedSelectable()
-static int GuiMeasureTextBox(const char *text, int length, Rectangle rec, int *pos, int mode)
+static int GuiMeasureTextBox(const char *text, int length, Rect rec, int *pos, int mode)
 {
     // Get gui font properties
     const Font font = guiFont;
@@ -1057,7 +1057,7 @@ static int GuiMeasureTextBox(const char *text, int length, Rectangle rec, int *p
             else if (mode == GUI_MEASURE_MODE_CURSOR_COORDS)
             {
                 // Check if the mouse pointer is inside the glyph rect
-                Rectangle grec = {rec.x + textOffsetX - 1, rec.y, (float)glyphWidth, (font.baseSize + font.baseSize/2)*scaleFactor - 1 };
+                Rect grec = {rec.x + textOffsetX - 1, rec.y, (float)glyphWidth, (font.baseSize + font.baseSize/2)*scaleFactor - 1 };
                 Vector2 mouse = GetMousePosition();
 
                 if (CheckCollisionPointRec(mouse, grec))
@@ -1085,7 +1085,7 @@ static int GuiMeasureTextBox(const char *text, int length, Rectangle rec, int *p
 
 // Required by GuiTextBoxEx()
 // Highly synchronized with calculations in DrawTextBoxedSelectable()
-static int GuiMeasureTextBoxRev(const char *text, int length, Rectangle rec, int *pos)
+static int GuiMeasureTextBoxRev(const char *text, int length, Rect rec, int *pos)
 {
     // Get gui font properties
     const Font font = guiFont;
@@ -1130,26 +1130,26 @@ static int GuiMeasureTextBoxRev(const char *text, int length, Rectangle rec, int
 }
 
 // Calculate cursor coordinates based on the cursor position `pos` inside the `text`.
-static inline int GuiTextBoxGetCursorCoordinates(const char *text, int length, Rectangle rec, int pos)
+static inline int GuiTextBoxGetCursorCoordinates(const char *text, int length, Rect rec, int pos)
 {
     return GuiMeasureTextBox(text, length, rec, &pos, GUI_MEASURE_MODE_CURSOR_POS);
 }
 
 // Calculate cursor position in textbox based on mouse coordinates.
-static inline int GuiTextBoxGetCursorFromMouse(const char *text, int length, Rectangle rec, int* pos)
+static inline int GuiTextBoxGetCursorFromMouse(const char *text, int length, Rect rec, int* pos)
 {
     return GuiMeasureTextBox(text, length, rec, pos, GUI_MEASURE_MODE_CURSOR_COORDS);
 }
 
 // Calculates how many characters is the textbox able to draw inside rec
-static inline int GuiTextBoxMaxCharacters(const char *text, int length, Rectangle rec)
+static inline int GuiTextBoxMaxCharacters(const char *text, int length, Rect rec)
 {
     int pos = -1;
     GuiMeasureTextBox(text, length, rec, &pos, GUI_MEASURE_MODE_CURSOR_END);
     return pos;
 }
 
-static inline void MoveTextBoxCursorRight(const char* text, int length, Rectangle textRec)
+static inline void MoveTextBoxCursorRight(const char* text, int length, Rect textRec)
 {
     // FIXME: Counting codepoints each time we press the key is expensive, find another way
     int count = GuiCountCodepointsUntilNewline(text);

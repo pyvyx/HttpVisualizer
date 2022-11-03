@@ -1,10 +1,16 @@
 #include <iostream>
+#include <cstdio>
 
-#include <stdio.h>
-#include <curl/curl.h>
+#define RAYGUI_IMPLEMENTATION
+#include "raylib.h"
+#include "raygui.h"
+#include "curl/curl.h"
+
 
 int main()
 {
+    InitWindow(600, 500, "HttpVisualizer");
+    
     CURL* curl;
     CURLcode res;
 
@@ -12,31 +18,9 @@ int main()
 
     curl = curl_easy_init();
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies.json");
+        curl_easy_setopt(curl, CURLOPT_URL, "http://www.boredapi.com/api/activity");
+        //curl_easy_setopt(curl, CURLOPT_URL, "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies.json");
 
-#ifdef SKIP_PEER_VERIFICATION
-        /*
-         * If you want to connect to a site who is not using a certificate that is
-         * signed by one of the certs in the CA bundle you have, you can skip the
-         * verification of the server's certificate. This makes the connection
-         * A LOT LESS SECURE.
-         *
-         * If you have a CA cert for the server stored someplace else than in the
-         * default bundle, then the CURLOPT_CAPATH option might come handy for
-         * you.
-         */
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-#endif
-
-#ifdef SKIP_HOSTNAME_VERIFICATION
-        /*
-         * If the site you are connecting to uses a different host name that what
-         * they have mentioned in their server certificate's commonName (or
-         * subjectAltName) fields, libcurl will refuse to connect. You can skip
-         * this check, but this will make the connection less secure.
-         */
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-#endif
 
         /* Perform the request, res will get the return code */
         res = curl_easy_perform(curl);
@@ -48,9 +32,14 @@ int main()
         /* always cleanup */
         curl_easy_cleanup(curl);
     }
-
     curl_global_cleanup();
-    std::cout << "Done\n";
-    std::cin.get();
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+        EndDrawing();
+    }
+    TerminateWindow();
     return 0;
 }
