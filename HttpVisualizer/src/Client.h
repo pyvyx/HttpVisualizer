@@ -6,11 +6,14 @@
 
 namespace Http 
 {
-    size_t CurlWrite_CallbackFunc_StdString(void* contents, size_t size, size_t nmemb, std::string* s)
+    namespace Callback
     {
-        const size_t newLength = size * nmemb;
-        s->append(static_cast<char*>(contents), newLength);
-        return newLength;
+        size_t CurlWriteString(void* contents, size_t size, size_t nmemb, std::string* s)
+        {
+            const size_t newLength = size * nmemb;
+            s->append(static_cast<char*>(contents), newLength);
+            return newLength;
+        }
     }
 
 
@@ -32,7 +35,7 @@ namespace Http
                 return;
             }
 
-            curl_easy_setopt(m_Handle, CURLOPT_WRITEFUNCTION, CurlWrite_CallbackFunc_StdString);
+            curl_easy_setopt(m_Handle, CURLOPT_WRITEFUNCTION, Callback::CurlWriteString);
             curl_easy_setopt(m_Handle, CURLOPT_WRITEDATA, &m_Response);
         }
 
@@ -41,6 +44,10 @@ namespace Http
             curl_easy_cleanup(m_Handle);
             curl_global_cleanup();
         }
+        Client(const Client&) = delete;
+        Client(const Client&&) = delete;
+        Client& operator=(const Client&) = delete;
+        Client&& operator=(const Client&&) = delete;
 
 
         CURLcode Get(const std::string& url) noexcept
