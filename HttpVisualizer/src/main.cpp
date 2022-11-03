@@ -1,12 +1,9 @@
 #include <iostream>
 #include <string>
 
-#define RAYGUI_IMPLEMENTATION
-#include "raylib.h"
-#include "raygui.h"
-#undef RAYGUI_IMPLEMENTATION
+#include "ImGui/imgui.h"
 
-#include "TextBox.h"
+#include "Window.h"
 #include "Client.h"
 
 /*
@@ -17,26 +14,22 @@
 
 int main()
 {
-    InitWindow(960, 670, "HttpVisualizer");
-    SetTargetFPS(60);
-    const float width = static_cast<float>(GetScreenWidth());
-    const float height = static_cast<float>(GetScreenHeight());
-    GuiSetStyle(DEFAULT, TEXT_SIZE, 25);
+    Window window;
+    window.imGuiInit();
 
-    Gui::TextBox url(0.f, 0.f, width, 35.f, true);
-    url.SetText(2048, '\0');
-
-    Gui::TextBox response(0.f, url.Height(), width, height - url.Height(), true);
-
-    while (!WindowShouldClose())
+    while (window.isOpen())
     {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        url.Draw();
-        //response.Draw();
-        EndDrawing();
+        window.clear();
+        window.imGuiStartFrame();
+
+        ImGui::Begin("test");
+        ImGui::Text("Hello world");
+        ImGui::End();
+
+        window.imGuiRender();
+        window.waitEvents();
+        window.swap();
     }
-    TerminateWindow();
     return 0;
 }
 
