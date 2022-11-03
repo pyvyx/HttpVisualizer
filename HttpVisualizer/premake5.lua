@@ -3,7 +3,10 @@ project "HttpVisualizer"
     cppdialect "C++17"
     flags "FatalWarnings"
 
-    defines "_CRT_SECURE_NO_WARNINGS"
+    defines { 
+        "_CRT_SECURE_NO_WARNINGS",
+        "CURL_STATICLIB" 
+    }
 
     -- gcc* clang* msc*
     filter "toolset:msc*"
@@ -78,7 +81,8 @@ project "HttpVisualizer"
     includedirs {
         RaylibDir .. "/src",
         RaylibDir .. "/include",
-        DepDir
+        DepDir,
+        "D:/Dev/HttpVisualizer/Dependencies/curl-7.86.0/builds/libcurl-vc22-x64-debug-static-ipv6-sspi-schannel/include"
     }
 
     externalincludedirs {
@@ -90,14 +94,23 @@ project "HttpVisualizer"
     links {
         "raylib",
         "Winmm",
-        "ws2_32"
+        "ws2_32",
+        "crypt32",
+        "Wldap32",
+        "Normaliz"
     }
 
+    
     filter { "configurations:Debug" }
         kind "ConsoleApp"
         floatingpoint "default"
+        libdirs "D:/Dev/HttpVisualizer/Dependencies/curl-7.86.0/builds/libcurl-vc22-x64-debug-static-ipv6-sspi-schannel/lib"
+        links "libcurl_a_debug"
 
     filter { "configurations:Release" }
-        kind "WindowedApp"
+        --kind "WindowedApp"
+        kind "ConsoleApp"
         entrypoint "mainCRTStartup"
         floatingpoint "fast"
+        libdirs "D:/Dev/HttpVisualizer/Dependencies/curl-7.86.0/builds/libcurl-vc22-x64-release-static-ipv6-sspi-schannel/lib"
+        links "libcurl_a"
