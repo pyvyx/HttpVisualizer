@@ -55,6 +55,7 @@ project "HttpVisualizer"
         }
 
     filter "toolset:gcc*"
+        print("GCC is currently not supported on windows!")
         warnings "Extra"
         externalwarnings "Off"
         linkgroups "on" -- activate position independent linking
