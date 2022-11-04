@@ -34,6 +34,7 @@ Window::Window(int width, int height, const char* title, GLFWmonitor* monitor, G
     glfwMakeContextCurrent(m_Window);
     glfwSwapInterval(1); // Enable vsync
     glClearColor(0.27f, 0.27f, 0.27f, 1.0f);
+    glfwSetWindowSizeLimits(m_Window, 400, 300, GLFW_DONT_CARE, GLFW_DONT_CARE);
 }
 
 
@@ -48,7 +49,7 @@ Window::~Window()
 }
 
 
-std::pair<float, float> Window::getSize() const
+ImVec2 Window::GetSize() const
 {
     int width, height;
     glfwGetWindowSize(m_Window, &width, &height);
@@ -66,7 +67,7 @@ void Window::imGuiInit(const char* iniFileName) const
     io.IniFilename = iniFileName;
 
     ImGuiStyle& style = ImGui::GetStyle();
-    style.FrameRounding = 5.f;
+    //style.FrameRounding = 5.f; --
     //style.WindowRounding = 5.f;
 
     ImGui_ImplGlfw_InitForOpenGL(m_Window, true);

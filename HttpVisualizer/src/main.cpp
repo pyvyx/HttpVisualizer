@@ -2,9 +2,12 @@
 #include <string>
 
 #include "ImGui/imgui.h"
+#include "ImGui/imgui_stdlib.h"
 
 #include "Window.h"
 #include "Client.h"
+#include "UrlInputSection.h"
+#include "ResponseBody.h"
 
 /*
     http://www.boredapi.com/api/activity
@@ -17,14 +20,26 @@ int main()
     Window window;
     window.imGuiInit();
 
+    UrlInput urlinput;
+    ResponseBody rb;
+    Http::Client client;
+
     while (window.isOpen())
     {
         window.clear();
         window.imGuiStartFrame();
 
-        ImGui::Begin("test");
-        ImGui::Text("Hello world");
-        ImGui::End();
+        if (urlinput.Draw(window.GetSize()))
+        {
+            if (client.Get(urlinput.Url()) != CURLE_OK)
+                rb.SetText(client.LastError());
+            else
+            {
+                rb.SetText(client.Response());
+                client.ClearResponse();
+            }
+        }
+        rb.Draw(window.GetSize());
 
         window.imGuiRender();
         window.waitEvents();
@@ -32,9 +47,3 @@ int main()
     }
     return 0;
 }
-
-
-//Http::Client client;
-//if (client.Get("http://www.boredapi.com/api/activity") != CURLE_OK)
-//    std::cout << "client.Get() failed: " << client.LastError() << std::endl;
-//std::cout << client.Response() << std::endl;

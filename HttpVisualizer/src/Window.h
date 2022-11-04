@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
 #include <utility>
+
 #include "GLFW/glfw3.h"
+#include "ImGui/imgui.h"
 
 #define IMGUI_WINDOW_FLAGS ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
 
@@ -12,7 +14,7 @@ private:
 	bool m_Resized = true;
 public:
 	// 1280 720 / 700 650
-	Window(int width = 930, int height = 850, const char* title = "Makefile-Generator", GLFWmonitor* monitor = NULL, GLFWwindow* share = NULL);
+	Window(int width = 930, int height = 650, const char* title = "HttpVisualizer", GLFWmonitor* monitor = NULL, GLFWwindow* share = NULL);
 	~Window();
 
 	inline void vsync(bool state) const { glfwSwapInterval(state); }
@@ -26,7 +28,7 @@ public:
 	inline void pollEvents() const { glfwPollEvents(); }
 	inline void waitEvents() const { glfwWaitEvents(); }
 
-	std::pair<float, float> getSize() const;
+	ImVec2 GetSize() const;
 
 	// ImGui
 	void imGuiInit(const char* iniFileName = NULL) const;
