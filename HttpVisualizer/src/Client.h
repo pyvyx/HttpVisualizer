@@ -60,5 +60,6 @@ namespace Http
 
         const char* LastError() const noexcept { return curl_easy_strerror(m_LastError); }
         const std::string& Response() const noexcept { return m_Response; }
+        void ClearResponse() { m_Response.clear(); }
     };
 }

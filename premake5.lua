@@ -37,4 +37,5 @@ staticruntime "on"
 removeunreferencedcodedata "on"
 
 include "HttpVisualizer"
-include "Dependencies/raylib"
+include "Dependencies/glfw"
+include "Dependencies/imgui"

@@ -5,7 +5,7 @@ project "HttpVisualizer"
 
     defines { 
         "_CRT_SECURE_NO_WARNINGS",
-        "CURL_STATICLIB" 
+        "CURL_STATICLIB"
     }
 
     CurlDir = cwd .. "/Dependencies/curl-7.86.0"
@@ -90,16 +90,24 @@ project "HttpVisualizer"
     includedirs {
         RaylibDir .. "/src",
         RaylibDir .. "/include",
-        CurlDir .. "/include"
+        CurlDir .. "/include",
+        "../Dependencies/glfw/include",
+        "../Dependencies/imgui/include"
     }
 
     externalincludedirs {
         RaylibDir .. "/src",
         RaylibDir .. "/include",
-        CurlDir .. "/include"
+        CurlDir .. "/include",
+        "../Dependencies/glfw/include",
+        "../Dependencies/imgui/include"
     }
 
-    links "raylib"
+    links {
+        "glfw",
+        "ImGui",
+        "opengl32"
+    }
 
     filter "system:windows"
         links {
