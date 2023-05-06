@@ -1,61 +1,85 @@
 project "HttpVisualizer"
     language "C++"
     cppdialect "C++17"
-    --flags "FatalWarnings"
+    defines "_CRT_SECURE_NO_WARNINGS"
 
-    defines { 
-        "_CRT_SECURE_NO_WARNINGS",
-        "CURL_STATICLIB"
+    files {
+        "src/**.cpp",
+        "src/**.h",
+        "vendor/**.cpp",
+        "vendor/**.h"
     }
 
-    CurlDir = cwd .. "/Dependencies/curl-7.86.0"
-    CurlBinDir = CurlDir .. "/Binaries"
-    filter { "system:windows", "platforms:x64" }
-        libdirs { CurlBinDir .. "/windows/x64" }
---
-    filter { "system:windows", "platforms:x86" }
-        libdirs { CurlBinDir .. "/windows/x86" }
+    includedirs {
+        "src",
+        "vendor",
+        "../Dependencies/glfw/include",
+        "../Dependencies/imgui/include",
+    }
 
-    -- gcc* clang* msc*
+    externalincludedirs {
+        "vendor",
+        "../Dependencies/imgui/include"
+    }
+
+    flags "FatalWarnings"
+
+    links {
+        "glfw",
+        "ImGui"
+    }
+
+    filter "system:windows"
+        links {
+            "gdi32",
+            "opengl32",
+            "shell32",
+            "ole32",
+            "uuid"
+        }
+
+    filter "system:linux"
+        links {
+            "GL",
+            "gtk-3",
+            "glib-2.0",
+            "gobject-2.0",
+            "X11",
+            "curl"
+        }
+
+    --gcc* clang* msc*
     filter "toolset:msc*"
-        warnings "High" -- High
-        externalwarnings "Default" -- Default
+        warnings "High"
+        externalwarnings "Off"
+        disablewarnings {}
         buildoptions { "/sdl" }
+        defines "MSVC"
 
     filter { "toolset:gcc* or toolset:clang*" }
         enablewarnings {
             "cast-align",
-            "cast-qual",
-            "ctor-dtor-privacy",
             "disabled-optimization",
             "format=2",
             "init-self",
-            "missing-declarations",
             "missing-include-dirs",
-            "old-style-cast",
             "overloaded-virtual",
             "redundant-decls",
             "shadow",
-            "sign-conversion",
             "sign-promo",
-            "strict-overflow=5",
-            "switch-default",
-            "undef",
             "uninitialized",
             "unreachable-code",
             "unused",
             "alloca",
-            "conversion",
-            "deprecated",
             "format-security",
             "null-dereference",
             "stack-protector",
             "vla",
             "shift-overflow"
         }
+        disablewarnings "format-nonliteral"
 
     filter "toolset:gcc*"
-        print("GCC is currently not supported on windows!")
         warnings "Extra"
         externalwarnings "Off"
         linkgroups "on" -- activate position independent linking
@@ -71,64 +95,23 @@ project "HttpVisualizer"
             "implicit-fallthrough=3",
             "trampolines"
         }
+        disablewarnings "cast-function-type"
+        defines "GCC"
 
     filter "toolset:clang*"
         warnings "Extra"
         externalwarnings "Everything"
         enablewarnings {
             "array-bounds",
-            "long-long",
-            "implicit-fallthrough", 
+            "long-long"
         }
+        disablewarnings {"cast-align", "sign-conversion"}
+        defines "CLANG"
     filter {}
 
-    files {
-        "**.cpp",
-        "**.h"
-    }
-
-    includedirs {
-        RaylibDir .. "/src",
-        RaylibDir .. "/include",
-        CurlDir .. "/include",
-        "../Dependencies/glfw/include",
-        "../Dependencies/imgui/include"
-    }
-
-    externalincludedirs {
-        RaylibDir .. "/src",
-        RaylibDir .. "/include",
-        CurlDir .. "/include",
-        "../Dependencies/glfw/include",
-        "../Dependencies/imgui/include"
-    }
-
-    links {
-        "glfw",
-        "ImGui",
-        "opengl32"
-    }
-
-    filter "system:windows"
-        links {
-            "Winmm",
-            "ws2_32",
-            "crypt32",
-            "Wldap32",
-            "Normaliz",
-            "Advapi32",
-            "user32",
-            "gdi32",
-            "shell32"
-        }
 
     filter { "configurations:Debug" }
         kind "ConsoleApp"
-        floatingpoint "default"
-        links "libcurl_a_debug"
-
     filter { "configurations:Release" }
         kind "WindowedApp"
         entrypoint "mainCRTStartup"
-        floatingpoint "fast"
-        links "libcurl_a"

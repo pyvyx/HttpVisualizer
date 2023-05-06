@@ -4,7 +4,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_stdlib.h"
 
-#include "Window.h"
+#include "RenderWindow.h"
 #include "Client.h"
 #include "UrlInputSection.h"
 #include "ResponseBody.h"
@@ -17,19 +17,17 @@
 
 int main()
 {
-    Window window;
-    window.imGuiInit();
+    RenderWindow window;
 
     UrlInput urlinput;
     ResponseBody rb;
     Http::Client client;
 
-    while (window.isOpen())
+    while (window.IsOpen())
     {
-        window.clear();
-        window.imGuiStartFrame();
+        window.StartFrame();
 
-        if (urlinput.Draw(window.GetSize()))
+        if (urlinput.Draw(window.Size()))
         {
             if (client.Get(urlinput.Url()) != CURLE_OK)
                 rb.SetText(client.LastError());
@@ -39,11 +37,8 @@ int main()
                 client.ClearResponse();
             }
         }
-        rb.Draw(window.GetSize());
-
-        window.imGuiRender();
-        window.waitEvents();
-        window.swap();
+        rb.Draw(window.Size());
+        window.EndFrame();
     }
     return 0;
 }
