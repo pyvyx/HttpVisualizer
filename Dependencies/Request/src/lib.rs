@@ -5,9 +5,17 @@ use std::ffi::CString;
 
 fn MakeRequest(url: &str) -> Result<String, reqwest::Error>
 {
-    println!("Blocking GET request to: '{}'", url);
     let res = reqwest::blocking::get(url)?.text()?;
     return Ok(res);
+}
+
+fn StringToCString(str: String) -> *const c_char
+{
+    if let Ok(s) = CString::new(str) 
+    {
+        return s.into_raw();
+    }
+    else { return std::ptr::null(); }
 }
 
 #[no_mangle]
@@ -19,27 +27,16 @@ pub extern "C" fn Request(url: *const c_char) -> *const c_char
 
     match MakeRequest(urlstr)
     {
-        Ok(str) =>
-        {
-            if let Ok(s) = CString::new(str) 
-            {
-                return s.into_raw();
-            }
-            else { return std::ptr::null(); }
-        }
-        Err(e)  =>
-        {
-            eprintln!("Failed to make request: '{}'", e);
-            return std::ptr::null();
-        },
+        Ok(str) => return StringToCString(str),
+        Err(e)  => return StringToCString(format!("Failed to make request: '{}'", e)),
     }
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn FreeRequest(ptr: *const c_char)
+pub unsafe extern "C" fn FreeResponse(response: *const c_char)
 {
-    if !ptr.is_null()
+    if !response.is_null()
     {
-        let _ = CString::from_raw(ptr as *mut _);
+        let _ = CString::from_raw(response as *mut _);
     }
 }

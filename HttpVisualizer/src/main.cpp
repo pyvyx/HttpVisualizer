@@ -28,7 +28,7 @@ int main()
             const char* response = Request(urlinput.Url());
             if (response != NULL)
                 rb.SetText(response);
-            FreeRequest(response);
+            FreeResponse(response);
         }
         rb.Draw(window.Size());
         window.EndFrame();

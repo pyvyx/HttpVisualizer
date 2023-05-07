@@ -9,7 +9,7 @@ extern "C" {
 
 const char *Request(const char *url);
 
-void FreeRequest(const char *ptr);
+void FreeResponse(const char *response);
 
 #ifdef __cplusplus
 } // extern "C"
