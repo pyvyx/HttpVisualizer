@@ -1,7 +1,10 @@
 project "HttpVisualizer"
     language "C++"
     cppdialect "C++17"
-    defines "_CRT_SECURE_NO_WARNINGS"
+    defines {
+        "_CRT_SECURE_NO_WARNINGS",
+        "CURL_STATICLIB"
+    }
 
     files {
         "src/**.cpp",
@@ -15,11 +18,13 @@ project "HttpVisualizer"
         "vendor",
         "../Dependencies/glfw/include",
         "../Dependencies/imgui/include",
+        "../Dependencies/curl-7.86.0/include"
     }
 
     externalincludedirs {
         "vendor",
-        "../Dependencies/imgui/include"
+        "../Dependencies/imgui/include",
+        "../Dependencies/curl-7.86.0/include"
     }
 
     flags "FatalWarnings"
@@ -29,13 +34,27 @@ project "HttpVisualizer"
         "ImGui"
     }
 
+    filter { "system:windows", "platforms:x64" }
+        libdirs "../Dependencies/curl-7.86.0/Binaries/windows/x64"
+--
+    filter { "system:windows", "platforms:x86" }
+        libdirs "../Dependencies/curl-7.86.0/Binaries/windows/x86"
+
     filter "system:windows"
         links {
             "gdi32",
             "opengl32",
             "shell32",
             "ole32",
-            "uuid"
+            "uuid",
+            "Winmm",
+            "ws2_32",
+            "crypt32",
+            "Wldap32",
+            "Normaliz",
+            "Advapi32",
+            "user32",
+            "libcurl_a"
         }
 
     filter "system:linux"
