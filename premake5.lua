@@ -12,14 +12,18 @@ targetdir(cwd .. outputdir .. "bin")
 objdir(cwd .. outputdir .. "bin-int")
 
 filter "system:windows"
-    platforms "x64"
+    platforms { "x64", "x86" }
     defines "WINDOWS"
 filter "system:linux"
     platforms "x64"
     defines "LINUX"
 
-architecture "x64"
-defines "X64"
+filter { "platforms:x64" }
+    architecture "x64"
+    defines "X64"
+filter { "platforms:x86" }
+    architecture "x86"
+    defines "X86"
 
 filter { "configurations:Debug" }
     runtime "Debug"

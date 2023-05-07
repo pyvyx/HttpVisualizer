@@ -34,10 +34,6 @@ create:
 
 clean:
 	if exist BIN rmdir /s /q BIN
-	if exist target\$(TARGET1)\release\$(LIB).lib  rmdir /s /q target\$(TARGET1)\release\$(LIB).lib
-	if exist target\$(TARGET2)\release\lib$(LIB).a rmdir /s /q target\$(TARGET2)\release\lib$(LIB).a
-	if exist target\$(TARGET3)\release\$(LIB).lib  rmdir /s /q target\$(TARGET3)\release\$(LIB).lib
-	if exist target\$(TARGET4)\release\lib$(LIB).a rmdir /s /q target\$(TARGET4)\release\lib$(LIB).a
 else
 build:
 	cargo build --release --target=$(TARGET)
@@ -51,7 +47,6 @@ create:
 
 clean:
 	rm -f -r BIN
-	rm -f target/$(TARGET)/release/lib$(LIB).a
 endif
 
 header:

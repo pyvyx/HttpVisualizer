@@ -74,7 +74,6 @@ project "HttpVisualizer"
     filter "toolset:msc*"
         warnings "High"
         externalwarnings "Off"
-        ignoredefaultlibraries "LIBCMT"
         buildoptions { "/sdl" }
         defines "MSVC"
 
