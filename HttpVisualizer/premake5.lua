@@ -2,10 +2,7 @@ project "HttpVisualizer"
     language "C++"
     cppdialect "C++17"
     flags "FatalWarnings"
-    defines {
-        "_CRT_SECURE_NO_WARNINGS",
-        "CURL_STATICLIB"
-    }
+    defines "_CRT_SECURE_NO_WARNINGS"
 
     files {
         "src/**.cpp",
@@ -19,14 +16,12 @@ project "HttpVisualizer"
         "vendor",
         "../Dependencies/glfw/include",
         "../Dependencies/imgui/include",
-        "../Dependencies/curl-7.86.0/include",
         "../Dependencies/Request/include"
     }
 
     externalincludedirs {
         "vendor",
-        "../Dependencies/imgui/include",
-        "../Dependencies/curl-7.86.0/include"
+        "../Dependencies/imgui/include"
     }
 
     links {
@@ -37,11 +32,9 @@ project "HttpVisualizer"
 
     filter { "system:windows", "platforms:x64" }
         libdirs "../Dependencies/Request/BIN/windows/x64"
-        libdirs "../Dependencies/curl-7.86.0/Binaries/windows/x64"
 --
     filter { "system:windows", "platforms:x86" }
         libdirs "../Dependencies/Request/BIN/windows/x86"
-        libdirs "../Dependencies/curl-7.86.0/Binaries/windows/x86"
 
     filter "system:windows"
         links {
@@ -57,12 +50,10 @@ project "HttpVisualizer"
             "Normaliz",
             "Advapi32",
             "user32",
-            --"Bcrypt",
             "Userenv",
             "Secur32",
             "ntdll",
-            "ncrypt",
-            "libcurl_a"
+            "ncrypt"
         }
 
     filter "system:linux"
@@ -71,8 +62,7 @@ project "HttpVisualizer"
             "gtk-3",
             "glib-2.0",
             "gobject-2.0",
-            "X11",
-            "curl"
+            "X11"
         }
 
     --gcc* clang* msc*

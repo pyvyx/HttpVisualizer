@@ -1,14 +1,10 @@
 #include <iostream>
 #include <string>
 
-#include "ImGui/imgui.h"
-#include "ImGui/imgui_stdlib.h"
-
-#include "RenderWindow.h"
-#include "Client.h"
-#include "UrlInputSection.h"
-#include "ResponseBody.h"
 #include "Request.h"
+#include "ResponseBody.h"
+#include "RenderWindow.h"
+#include "UrlInputSection.h"
 
 /*
     http://www.boredapi.com/api/activity
@@ -22,7 +18,6 @@ int main()
     
     UrlInput urlinput;
     ResponseBody rb;
-    Http::Client client;
     
     while (window.IsOpen())
     {
@@ -30,13 +25,10 @@ int main()
     
         if (urlinput.Draw(window.Size()))
         {
-            if (client.Get(urlinput.Url()) != CURLE_OK)
-                rb.SetText(client.LastError());
-            else
-            {
-                rb.SetText(client.Response());
-                client.ClearResponse();
-            }
+            const char* response = Request(urlinput.Url());
+            if (response != NULL)
+                rb.SetText(response);
+            FreeRequest(response);
         }
         rb.Draw(window.Size());
         window.EndFrame();
