@@ -1,5 +1,6 @@
 LIB=request
 HEADER=Request
+LIBFOLDER=Lib
 
 ifeq ($(OS),Windows_NT)
 	TARGET1=x86_64-pc-windows-msvc
@@ -22,31 +23,31 @@ build:
 	cargo build --release --target=$(TARGET4)
 
 move: create
-	move /y target\$(TARGET1)\release\$(LIB).lib BIN/windows/x64/$(LIB).lib
-	move /y target\$(TARGET2)\release\lib$(LIB).a BIN/windows/x64/lib$(LIB).a
-	move /y target\$(TARGET3)\release\$(LIB).lib BIN/windows/x86/$(LIB).lib
-	move /y target\$(TARGET4)\release\lib$(LIB).a BIN/windows/x86/lib$(LIB).a
+	move /y target\$(TARGET1)\release\$(LIB).lib $(LIBFOLDER)/windows/x64/$(LIB).lib
+	move /y target\$(TARGET2)\release\lib$(LIB).a $(LIBFOLDER)/windows/x64/lib$(LIB).a
+	move /y target\$(TARGET3)\release\$(LIB).lib $(LIBFOLDER)/windows/x86/$(LIB).lib
+	move /y target\$(TARGET4)\release\lib$(LIB).a $(LIBFOLDER)/windows/x86/lib$(LIB).a
 
 create:
-	if exist BIN rmdir /s /q BIN
-	mkdir BIN\windows\x64
-	mkdir BIN\windows\x86
+	if exist $(LIBFOLDER) rmdir /s /q $(LIBFOLDER)
+	mkdir $(LIBFOLDER)\windows\x64
+	mkdir $(LIBFOLDER)\windows\x86
 
 clean:
-	if exist BIN rmdir /s /q BIN
+	if exist $(LIBFOLDER) rmdir /s /q $(LIBFOLDER)
 else
 build:
 	cargo build --release --target=$(TARGET)
 
 move: create
-	mv target/$(TARGET)/release/lib$(LIB).a BIN/linux/x64/lib$(LIB).a
+	mv target/$(TARGET)/release/lib$(LIB).a $(LIBFOLDER)/linux/x64/lib$(LIB).a
 
 create:
-	rm -f -r BIN
-	mkdir -p BIN/linux/x64
+	rm -f -r $(LIBFOLDER)
+	mkdir -p $(LIBFOLDER)/linux/x64
 
 clean:
-	rm -f -r BIN
+	rm -f -r $(LIBFOLDER)
 endif
 
 header:
