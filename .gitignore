@@ -4,7 +4,7 @@ BIN/
 Dependencies/Request/target
 
 Makefile
-makefile
+!Dependencies/Request/makefile
 *.sln
 *.vcxproj
 *.vcxproj.user
