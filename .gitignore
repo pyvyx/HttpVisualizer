@@ -1,11 +1,3 @@
-BIN/
-.vs/
 .git/
-Dependencies/Request/target
-
-Makefile
-!Dependencies/Request/makefile
-*.sln
-*.vcxproj
-*.vcxproj.user
-*.vcxproj.filters
+target/
+Cargo.lock
