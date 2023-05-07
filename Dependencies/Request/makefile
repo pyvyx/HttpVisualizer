@@ -7,45 +7,52 @@ ifeq ($(OS),Windows_NT)
 	TARGET3=i686-pc-windows-msvc
 	TARGET4=i686-pc-windows-gnu
 else
-	TARGET1=x86_64-unknown-linux-gnu
-	TARGET2=i686-unknown-linux-gnu
-	TARGET3=
-	TARGET4=
+	TARGET=x86_64-unknown-linux-gnu
 endif
 
-.PHONY: all build header move create
+.PHONY: all build header move create clean
 
 all: build header move
 
+ifeq ($(OS),Windows_NT)
 build:
 	cargo build --release --target=$(TARGET1)
 	cargo build --release --target=$(TARGET2)
 	cargo build --release --target=$(TARGET3)
 	cargo build --release --target=$(TARGET4)
 
-header:
-	cbindgen --config cbindgen.toml --output include/$(HEADER).h
-
-ifeq ($(OS),Windows_NT)
 move: create
 	move /y target\$(TARGET1)\release\$(LIB).lib BIN/windows/x64/$(LIB).lib
 	move /y target\$(TARGET2)\release\lib$(LIB).a BIN/windows/x64/lib$(LIB).a
 	move /y target\$(TARGET3)\release\$(LIB).lib BIN/windows/x86/$(LIB).lib
 	move /y target\$(TARGET4)\release\lib$(LIB).a BIN/windows/x86/lib$(LIB).a
-else
-move: create
-	mv target/$(TARGET1)/release/$(LIB).lib BIN/$(TARGET1)/$(LIB).lib
-	mv target/$(TARGET2)/release/lib$(LIB).a BIN/$(TARGET2)/lib$(LIB).a
-endif
 
-ifeq ($(OS),Windows_NT)
 create:
 	if exist BIN rmdir /s /q BIN
 	mkdir BIN\windows\x64
 	mkdir BIN\windows\x86
+
+clean:
+	if exist BIN rmdir /s /q BIN
+	if exist target\$(TARGET1)\release\$(LIB).lib  rmdir /s /q target\$(TARGET1)\release\$(LIB).lib
+	if exist target\$(TARGET2)\release\lib$(LIB).a rmdir /s /q target\$(TARGET2)\release\lib$(LIB).a
+	if exist target\$(TARGET3)\release\$(LIB).lib  rmdir /s /q target\$(TARGET3)\release\$(LIB).lib
+	if exist target\$(TARGET4)\release\lib$(LIB).a rmdir /s /q target\$(TARGET4)\release\lib$(LIB).a
 else
+build:
+	cargo build --release --target=$(TARGET)
+
+move: create
+	mv target/$(TARGET)/release/lib$(LIB).a BIN/linux/x64/lib$(LIB).a
+
 create:
-	rm -f BIN
-	mkdir -p BIN\linux\x64
-	mkdir -p BIN\linux\x86
+	rm -f -r BIN
+	mkdir -p BIN/linux/x64
+
+clean:
+	rm -f -r BIN
+	rm -f target/$(TARGET)/release/lib$(LIB).a
 endif
+
+header:
+	cbindgen --config cbindgen.toml --output include/$(HEADER).h

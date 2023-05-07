@@ -32,9 +32,12 @@ project "HttpVisualizer"
 
     filter { "system:windows", "platforms:x64" }
         libdirs "../Dependencies/Request/BIN/windows/x64"
---
+
     filter { "system:windows", "platforms:x86" }
         libdirs "../Dependencies/Request/BIN/windows/x86"
+
+    filter { "system:linux", "platforms:x64" }
+        libdirs "../Dependencies/Request/BIN/linux/x64"
 
     filter "system:windows"
         links {
@@ -62,7 +65,9 @@ project "HttpVisualizer"
             "gtk-3",
             "glib-2.0",
             "gobject-2.0",
-            "X11"
+            "X11",
+            "ssl",
+            "crypto"
         }
 
     --gcc* clang* msc*
