@@ -1,6 +1,7 @@
 BIN/
 .vs/
 .git/
+Dependencies/Request/target
 
 Makefile
 makefile
