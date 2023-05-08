@@ -5,12 +5,6 @@ fn Request(url: &String) -> Result<String, reqwest::Error>
     /*
         http://www.boredapi.com/api/activity
         https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies.json
-
-        match Request("..")
-        {
-            Ok(response) => println!("{}", response),
-            Err(e)  => return println!("Failed to make request: '{}'", e),
-        }
     */
     return Ok(reqwest::blocking::get(url)?.text()?);
 }
@@ -42,9 +36,15 @@ fn main()
     let btnHeight = 30;
     let x = 5;
     let y = 10;
-    let input = Input::new(x, y, wind.width()-2*x-10-btnWidth, btnHeight, "");
+    let outHeight = (wind.height() - 3*y - btnHeight) / 2;
+    let mut input = Input::new(x, y, wind.width()-2*x-10-btnWidth, btnHeight, "");
     let mut btn = Button::new(wind.width()-btnWidth-x, y, btnWidth, btnHeight, "Get");
-    let mut out = MultilineOutput::new(x, 50, wind.width()-2*x, wind.height()-input.height()-30, "");
+    let mut outJson = MultilineOutput::new(x, 50, wind.width()-2*x, outHeight, "");
+    let mut outParsed = MultilineOutput::new(x, 50 + outHeight + y, wind.width()-2*x, outHeight, "");
+
+    input.set_color(Color::Dark2);
+    outJson.set_color(Color::Dark2);
+    outParsed.set_color(Color::Dark2);
 
     wind.end();
     wind.show();
@@ -62,8 +62,26 @@ fn main()
                 {
                     match Request(&input.value())
                     {
-                        Ok(response) => out.set_value(&response),
-                        Err(e)  => out.set_value(&format!("Failed to make request: '{}'", e)),
+                        Ok(response) =>
+                            {
+                                outJson.set_value(&response);
+                                let jsonRes = serde_json::from_str(&response);
+                                if jsonRes.is_err()
+                                {
+                                    outParsed.set_value(&format!("JSON was not well-formatted: {}", jsonRes.unwrap_err()));
+                                }
+                                else
+                                {
+                                    let json: serde_json::Value = jsonRes.unwrap();
+                                    let mut content = String::new();
+                                    for (key, value) in json.as_object().unwrap()
+                                    {
+                                        content += &format!("{} = {}\n", key, value);
+                                    }
+                                    outParsed.set_value(&content);
+                                }
+                            },
+                        Err(e)  => outJson.set_value(&format!("Failed to make request: '{}'", e)),
                     }
                 }
             }
